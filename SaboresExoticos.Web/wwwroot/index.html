@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sabores Exóticos · Sistema Integrado</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ============================================================
+     CURSOR PERSONALIZADO
+============================================================ -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-dot" id="cursorDot"></div>
+
+<!-- ============================================================
+     NAVEGACIÓN PRINCIPAL
+============================================================ -->
+<nav class="nav-tabs" id="mainNav">
+  <div class="nav-brand">
+    <div class="nav-logo">
+      <span class="logo-ring"></span>
+      <span class="logo-dot"></span>
+    </div>
+    <span>Sabores<em>Exóticos</em></span>
+  </div>
+  <ul class="nav-links">
+    <li>
+      <button class="active" onclick="showPage('clientePage', this)" data-label="01">
+        Menú &amp; Pedido
+        <span class="badge" id="cartBadge" style="display:none">0</span>
+      </button>
+    </li>
+    <li>
+      <button onclick="showPage('cocinaPage', this)" data-label="02">
+        Cocina
+        <span class="badge" id="kitchenBadge">0</span>
+      </button>
+    </li>
+    <li>
+      <button onclick="showPage('erpPage', this)" data-label="03">
+        ERP / POS
+      </button>
+    </li>
+  </ul>
+  <div class="nav-time" id="navTime"></div>
+</nav>
+
+
+<!-- ============================================================
+     PÁGINA 1: CLIENTE — Menú y Pedido
+============================================================ -->
+<section class="page active" id="clientePage">
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-noise"></div>
+    <div class="hero-inner">
+      <div class="hero-text">
+        <p class="hero-eyebrow">
+          <span class="eyebrow-line"></span>
+          Heladería Artesanal · Biodiversidad Colombiana
+        </p>
+        <h1 class="hero-title">
+          Sabores<br>
+          <em>Exóticos</em>
+        </h1>
+        <p class="hero-sub">De las comunidades del territorio colombiano, directo a tu paladar.</p>
+        <div class="hero-origins">
+          <span class="origin-chip">Amazonas</span>
+          <span class="origin-chip">Chocó</span>
+          <span class="origin-chip">Caribe</span>
+          <span class="origin-chip">Llanos</span>
+          <span class="origin-chip">Sierra Nevada</span>
+        </div>
+      </div>
+      <div class="hero-card">
+        <div class="hero-card-accent"></div>
+        <div class="hero-card-content">
+          <p class="card-overline">Sistema de Turnos</p>
+          <h3>Ordena sin filas</h3>
+          <p>Elige tu helado, obtén tu turno y recógelo listo. Apoyamos comunidades indígenas y campesinas.</p>
+          <div class="hero-card-stat">
+            <div class="stat-item">
+              <span class="stat-num" id="heroStatOrders">0</span>
+              <span class="stat-lbl">Pedidos hoy</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <span class="stat-num">~4</span>
+              <span class="stat-lbl">Min. espera</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <span class="stat-num">8</span>
+              <span class="stat-lbl">Sabores</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-scroll-hint">
+      <span>Explorar menú</span>
+      <div class="scroll-arrow"></div>
+    </div>
+  </header>
+
+  <!-- Contenido principal -->
+  <div class="client-main">
+
+    <section class="catalog-section">
+      <div class="sec-header">
+        <div class="sec-header-left">
+          <span class="sec-num">01</span>
+          <h2>Nuestro Menú</h2>
+        </div>
+        <div class="sec-filter">
+          <button class="filter-btn active" onclick="filterProducts('all', this)">Todos</button>
+          <button class="filter-btn" onclick="filterProducts('Amazonas', this)">Amazonas</button>
+          <button class="filter-btn" onclick="filterProducts('Caribe', this)">Caribe</button>
+          <button class="filter-btn" onclick="filterProducts('Chocó', this)">Chocó</button>
+          <button class="filter-btn" onclick="filterProducts('Llanos', this)">Llanos</button>
+          <button class="filter-btn" onclick="filterProducts('Sierra Nevada', this)">Sierra</button>
+        </div>
+      </div>
+      <div class="products-grid" id="productsGrid"></div>
+    </section>
+
+    <!-- Sidebar del pedido -->
+    <aside class="order-sidebar" id="orderSidebar">
+      <div class="order-head">
+        <div>
+          <p class="order-head-label">Tu selección</p>
+          <h3>Pedido <span class="order-count-inline" id="orderCount">0</span></h3>
+        </div>
+        <button class="order-clear-btn" onclick="clearCart()" id="clearCartBtn" style="display:none">Vaciar</button>
+      </div>
+      <div class="order-items" id="orderItems">
+        <div class="cart-empty">
+          <div class="cart-empty-icon">◯</div>
+          <p>Agrega helados para comenzar</p>
+        </div>
+      </div>
+      <div class="order-summary" id="orderSummary">
+        <div class="sum-row">
+          <span class="lbl">Tiempo estimado</span>
+          <span class="val-muted"><strong id="waitTime">0</strong> min</span>
+        </div>
+        <div class="sum-row sum-total">
+          <span class="lbl">Total</span>
+          <span class="val-total">$<span id="totalPrice">0</span></span>
+        </div>
+        <div class="checkout-area">
+          <input type="text" class="customer-input" id="customerName" placeholder="Tu nombre (opcional)" />
+          <button class="checkout-btn" id="checkoutBtn" disabled>
+            <span class="btn-text">Confirmar Pedido</span>
+            <span class="btn-arrow">→</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="logo-ring small"></span>
+          <span class="logo-dot small"></span>
+        </div>
+        <span>Sabores <em>Exóticos</em></span>
+      </div>
+      <p class="footer-copy">Heladería Artesanal · Isaac Núñez · Nicolas Betancourt · Daniel Rojas · Andres Murcia · 2026</p>
+      <p class="footer-mission">Apoyando la biodiversidad y comunidades colombianas</p>
+    </div>
+  </footer>
+
+</section>
+
+
+<!-- ============================================================
+     PÁGINA 2: COCINA — Panel Kanban
+============================================================ -->
+<section class="page kitchen-page" id="cocinaPage">
+
+  <div class="kitchen-header">
+    <div class="kitchen-header-left">
+      <p class="page-eyebrow"><span class="eyebrow-line"></span> Panel de Cocina</p>
+      <h2>Pedidos en <em>Tiempo Real</em></h2>
+    </div>
+    <div class="kitchen-stats">
+      <div class="k-stat">
+        <div class="k-stat-val" id="kPending">0</div>
+        <div class="k-stat-lbl">Pendientes</div>
+      </div>
+      <div class="k-stat-divider"></div>
+      <div class="k-stat">
+        <div class="k-stat-val" id="kProgress">0</div>
+        <div class="k-stat-lbl">En proceso</div>
+      </div>
+      <div class="k-stat-divider"></div>
+      <div class="k-stat">
+        <div class="k-stat-val" id="kDone">0</div>
+        <div class="k-stat-lbl">Entregados hoy</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="kitchen-grid">
+    <div class="kitchen-lane">
+      <div class="kitchen-lane-header pending">
+        <span class="lane-icon">⏳</span>
+        <span>Pendientes</span>
+        <span class="lane-count" id="laneCountPending">0</span>
+      </div>
+      <div class="kitchen-col" id="colPending"></div>
+    </div>
+    <div class="kitchen-lane">
+      <div class="kitchen-lane-header progress">
+        <span class="lane-icon">🔥</span>
+        <span>En Preparación</span>
+        <span class="lane-count" id="laneCountProgress">0</span>
+      </div>
+      <div class="kitchen-col" id="colProgress"></div>
+    </div>
+    <div class="kitchen-lane">
+      <div class="kitchen-lane-header done">
+        <span class="lane-icon">✓</span>
+        <span>Listos para Entrega</span>
+        <span class="lane-count" id="laneCountDone">0</span>
+      </div>
+      <div class="kitchen-col" id="colDone"></div>
+    </div>
+  </div>
+
+</section>
+
+
+<!-- ============================================================
+     PÁGINA 3: ERP / POS
+============================================================ -->
+<section class="page" id="erpPage">
+  <div class="erp-layout">
+
+    <nav class="erp-sidebar">
+      <div class="erp-sidebar-brand">
+        <p class="erp-sidebar-title">Sistema ERP</p>
+        <p class="erp-sidebar-sub">Sabores Exóticos</p>
+      </div>
+      <ul class="erp-sidebar-nav">
+        <li class="erp-sidebar-section">Principal</li>
+        <li>
+          <button class="active" onclick="showErpPanel('dashPanel', this)">
+            <span class="erp-nav-icon">◈</span> Dashboard
+          </button>
+        </li>
+        <li>
+          <button onclick="showErpPanel('salesPanel', this)">
+            <span class="erp-nav-icon">◉</span> Ventas
+          </button>
+        </li>
+        <li class="erp-sidebar-section">Inventario</li>
+        <li>
+          <button onclick="showErpPanel('inventoryPanel', this)">
+            <span class="erp-nav-icon">▣</span> Inventario
+          </button>
+        </li>
+        <li>
+          <button onclick="showErpPanel('suppliersPanel', this)">
+            <span class="erp-nav-icon">◎</span> Proveedores
+          </button>
+        </li>
+        <li class="erp-sidebar-section">Administración</li>
+        <li>
+          <button onclick="showErpPanel('invoicesPanel', this)">
+            <span class="erp-nav-icon">▦</span> Facturas
+          </button>
+        </li>
+        <li>
+          <button onclick="showErpPanel('reportsPanel', this)">
+            <span class="erp-nav-icon">◫</span> Reportes
+          </button>
+        </li>
+      </ul>
+    </nav>
+
+    <main class="erp-content">
+
+      <!-- PANEL: Dashboard -->
+      <div class="erp-panel active" id="dashPanel">
+        <div class="erp-panel-header">
+          <div>
+            <p class="panel-eyebrow">Resumen operativo</p>
+            <h2>Dashboard</h2>
+          </div>
+          <p class="dash-date" id="dashDate"></p>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card k1">
+            <div class="kpi-accent"></div>
+            <div class="kpi-lbl">Ventas Hoy</div>
+            <div class="kpi-val" id="kpiSalesDay">$0</div>
+            <div class="kpi-sub" id="kpiSalesSub">0 pedidos</div>
+            <span class="kpi-glyph">$</span>
+          </div>
+          <div class="kpi-card k2">
+            <div class="kpi-accent"></div>
+            <div class="kpi-lbl">Ventas Mes</div>
+            <div class="kpi-val">$1.280.000</div>
+            <div class="kpi-sub">↑ 12% vs mes anterior</div>
+            <span class="kpi-glyph">↗</span>
+          </div>
+          <div class="kpi-card k3">
+            <div class="kpi-accent"></div>
+            <div class="kpi-lbl">Sabor Top</div>
+            <div class="kpi-val kpi-val-sm" id="kpiBest">—</div>
+            <div class="kpi-sub">Más vendido hoy</div>
+            <span class="kpi-glyph">★</span>
+          </div>
+          <div class="kpi-card k4">
+            <div class="kpi-accent"></div>
+            <div class="kpi-lbl">T. Prom. Espera</div>
+            <div class="kpi-val" id="kpiAvgTime">0 min</div>
+            <div class="kpi-sub">Meta: &lt;5 min</div>
+            <span class="kpi-glyph">⏱</span>
+          </div>
+        </div>
+
+        <div class="erp-two-col">
+          <div class="erp-table-wrap">
+            <div class="erp-table-head">
+              <h3>Pedidos Recientes</h3>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Turno</th><th>Productos</th><th>Total</th><th>Espera</th><th>Estado</th>
+                </tr>
+              </thead>
+              <tbody id="recentOrdersBody">
+                <tr><td colspan="5" class="table-empty">Sin pedidos aún</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="bar-chart-wrap">
+            <h3>Ventas por Producto (Hoy)</h3>
+            <div class="bars" id="salesBars">
+              <div class="bars-empty">Sin datos de ventas</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL: Ventas -->
+      <div class="erp-panel" id="salesPanel">
+        <div class="erp-panel-header">
+          <div>
+            <p class="panel-eyebrow">Historial completo</p>
+            <h2>Ventas</h2>
+          </div>
+          <div class="panel-actions">
+            <button class="erp-btn erp-btn-outline" onclick="exportCSV()">↓ Exportar CSV</button>
+          </div>
+        </div>
+        <div class="erp-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th><th>Turno</th><th>Productos</th>
+                <th>Total</th><th>Espera</th><th>Fecha</th><th>Estado</th>
+              </tr>
+            </thead>
+            <tbody id="salesBody">
+              <tr><td colspan="7" class="table-empty">Sin ventas registradas</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PANEL: Inventario -->
+      <div class="erp-panel" id="inventoryPanel">
+        <div class="erp-panel-header">
+          <div>
+            <p class="panel-eyebrow">Control de materias primas</p>
+            <h2>Inventario</h2>
+          </div>
+          <div class="panel-actions">
+            <button class="erp-btn erp-btn-primary" onclick="openModal('modalInventory')">+ Nuevo Insumo</button>
+          </div>
+        </div>
+        <div class="erp-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Insumo</th><th>Origen</th><th>Stock</th>
+                <th>Unidad</th><th>Mínimo</th><th>Estado</th><th></th>
+              </tr>
+            </thead>
+            <tbody id="inventoryBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PANEL: Proveedores -->
+      <div class="erp-panel" id="suppliersPanel">
+        <div class="erp-panel-header">
+          <div>
+            <p class="panel-eyebrow">Red comunitaria</p>
+            <h2>Proveedores</h2>
+          </div>
+          <div class="panel-actions">
+            <button class="erp-btn erp-btn-primary" onclick="openModal('modalSupplier')">+ Nuevo Proveedor</button>
+          </div>
+        </div>
+        <div class="erp-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Comunidad</th><th>Región</th><th>Productos</th>
+                <th>Certificación</th><th>Estado</th><th></th>
+              </tr>
+            </thead>
+            <tbody id="suppliersBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PANEL: Facturas -->
+      <div class="erp-panel" id="invoicesPanel">
+        <div class="erp-panel-header">
+          <div>
+            <p class="panel-eyebrow">Registro contable</p>
+            <h2>Facturas</h2>
+          </div>
+        </div>
+        <div class="erp-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>N° Factura</th><th>Turno</th><th>Items</th>
+                <th>Subtotal</th><th>IVA (19%)</th><th>Total</th><th>Fecha</th>
+              </tr>
+            </thead>
+            <tbody id="invoicesBody">
+              <tr><td colspan="7" class="table-empty">Sin facturas generadas</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PANEL: Reportes -->
+      <div class="erp-panel" id="reportsPanel">
+        <div class="erp-panel-header">
+          <div>
+            <p class="panel-eyebrow">Indicadores de desempeño</p>
+            <h2>Reportes &amp; Analíticas</h2>
+          </div>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi-card k1">
+            <div class="kpi-accent"></div>
+            <div class="kpi-lbl">Sabor + Rentable</div>
+            <div class="kpi-val kpi-val-sm">Pistacho</div>
+            <div class="kpi-sub">Margen 68%</div>
+            <span class="kpi-glyph">🏆</span>
+          </div>
+          <div class="kpi-card k2">
+            <div class="kpi-accent"></div>
+            <div class="kpi-lbl">Proveedor Top</div>
+            <div class="kpi-val kpi-val-sm">Cabildo Uitoto</div>
+            <div class="kpi-sub">Amazonas</div>
+            <span class="kpi-glyph">◎</span>
+          </div>
+          <div class="kpi-card k3">
+            <div class="kpi-accent"></div>
+            <div class="kpi-lbl">Clientes Atendidos</div>
+            <div class="kpi-val" id="rptClients">0</div>
+            <div class="kpi-sub">Este mes</div>
+            <span class="kpi-glyph">◉</span>
+          </div>
+          <div class="kpi-card k4">
+            <div class="kpi-accent"></div>
+            <div class="kpi-lbl">T. Prom. Preparación</div>
+            <div class="kpi-val">3.8 min</div>
+            <div class="kpi-sub">Meta: &lt;5 min ✓</div>
+            <span class="kpi-glyph">⚡</span>
+          </div>
+        </div>
+
+        <div class="bar-chart-wrap full-width">
+          <h3>Ventas por Región de Origen (Mes Actual)</h3>
+          <div class="bars region-bars">
+            <div class="bar-col">
+              <div class="bar-val">32%</div>
+              <div class="bar-fill" style="height:120px; --bar-color:#C85F3C"></div>
+              <div class="bar-lbl">Amazonas</div>
+            </div>
+            <div class="bar-col">
+              <div class="bar-val">18%</div>
+              <div class="bar-fill" style="height:68px; --bar-color:#C9A227"></div>
+              <div class="bar-lbl">Chocó</div>
+            </div>
+            <div class="bar-col">
+              <div class="bar-val">25%</div>
+              <div class="bar-fill" style="height:95px; --bar-color:#4A7C59"></div>
+              <div class="bar-lbl">Caribe</div>
+            </div>
+            <div class="bar-col">
+              <div class="bar-val">10%</div>
+              <div class="bar-fill" style="height:38px; --bar-color:#7a6bde"></div>
+              <div class="bar-lbl">Llanos</div>
+            </div>
+            <div class="bar-col">
+              <div class="bar-val">15%</div>
+              <div class="bar-fill" style="height:58px; --bar-color:#6dbf8c"></div>
+              <div class="bar-lbl">Sierra Nev.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     MODAL: Ticket de turno
+============================================================ -->
+<div class="modal-overlay" id="ticketModal">
+  <div class="ticket-box">
+    <div class="ticket-perforation top"></div>
+    <div class="ticket-head">
+      <p class="ticket-brand-label">SABORES EXÓTICOS</p>
+      <h2>Pedido Confirmado</h2>
+      <p class="ticket-sub">Heladería Artesanal · Colombia</p>
+    </div>
+    <div class="ticket-divider">
+      <span></span><span class="ticket-divider-text">Tu turno</span><span></span>
+    </div>
+    <div class="ticket-body">
+      <div class="ticket-num-display" id="ticketNum">001</div>
+      <div class="ticket-details">
+        <div class="ticket-detail-row">
+          <span>Total a pagar</span>
+          <span class="ticket-detail-val">$<span id="ticketTotal">0</span></span>
+        </div>
+        <div class="ticket-detail-row">
+          <span>Tiempo de espera</span>
+          <span class="ticket-detail-val"><span id="ticketTime">0</span> min</span>
+        </div>
+      </div>
+      <p class="ticket-note">Presenta este número al recoger tu pedido</p>
+      <button class="ticket-close" onclick="closeTicket()">Cerrar</button>
+    </div>
+    <div class="ticket-perforation bottom"></div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     MODAL: Nuevo Insumo
+============================================================ -->
+<div class="erp-modal-overlay" id="modalInventory">
+  <div class="erp-modal">
+    <div class="erp-modal-head">
+      <h3>Nuevo Insumo</h3>
+      <button class="erp-modal-close" onclick="closeModal('modalInventory')">✕</button>
+    </div>
+    <div class="erp-modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nombre del insumo</label>
+          <input type="text" id="invName" placeholder="Ej: Pulpa de Lúcuma" />
+        </div>
+        <div class="form-group">
+          <label>Origen / Región</label>
+          <input type="text" id="invOrigin" placeholder="Ej: Amazonas" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Stock Actual</label>
+          <input type="number" id="invStock" placeholder="0" min="0" />
+        </div>
+        <div class="form-group">
+          <label>Unidad</label>
+          <select id="invUnit">
+            <option>kg</option><option>L</option>
+            <option>g</option><option>ml</option><option>unidades</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Stock Mínimo (alerta)</label>
+        <input type="number" id="invMin" placeholder="0" min="0" />
+      </div>
+    </div>
+    <div class="erp-modal-foot">
+      <button class="erp-btn erp-btn-cancel" onclick="closeModal('modalInventory')">Cancelar</button>
+      <button class="erp-btn erp-btn-primary" onclick="saveInventoryItem()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     MODAL: Nuevo Proveedor
+============================================================ -->
+<div class="erp-modal-overlay" id="modalSupplier">
+  <div class="erp-modal">
+    <div class="erp-modal-head">
+      <h3>Nuevo Proveedor</h3>
+      <button class="erp-modal-close" onclick="closeModal('modalSupplier')">✕</button>
+    </div>
+    <div class="erp-modal-body">
+      <div class="form-group">
+        <label>Nombre / Comunidad</label>
+        <input type="text" id="supName" placeholder="Ej: Cabildo Indígena Uitoto" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Región</label>
+          <select id="supRegion">
+            <option>Amazonas</option><option>Chocó</option>
+            <option>Caribe</option><option>Llanos Orientales</option>
+            <option>Sierra Nevada</option><option>Otra</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Certificación</label>
+          <select id="supCert">
+            <option>Comercio Justo</option><option>Orgánico</option>
+            <option>Agroecológico</option><option>Sin certificación</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Productos Suministrados</label>
+        <input type="text" id="supProducts" placeholder="Ej: Pulpa de lúcuma, Cacao" />
+      </div>
+    </div>
+    <div class="erp-modal-foot">
+      <button class="erp-btn erp-btn-cancel" onclick="closeModal('modalSupplier')">Cancelar</button>
+      <button class="erp-btn erp-btn-primary" onclick="saveSupplier()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- TOAST -->
+<div class="alert-banner" id="alertBanner">
+  <span class="alert-dot"></span>
+  <span id="alertMsg">Guardado correctamente</span>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

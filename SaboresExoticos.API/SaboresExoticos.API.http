@@ -1,0 +1,6 @@
+@SaboresExoticos.API_HostAddress = http://localhost:5230
+
+GET {{SaboresExoticos.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

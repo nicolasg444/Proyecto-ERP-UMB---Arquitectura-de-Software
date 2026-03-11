@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="SaboresExoticos.API/SaboresExoticos.API.csproj" />
+  <Project Path="SaboresExoticos.Web/SaboresExoticos.Web.csproj" />
+</Solution>
