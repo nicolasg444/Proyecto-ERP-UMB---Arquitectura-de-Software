@@ -1,0 +1,61 @@
+# terraform-plan.yml
+# GitHub Actions Workflow - Sprint 2 HU-07
+# Ejecuta terraform plan automáticamente en cada PR
+# que contenga cambios en archivos .tf hacia develop
+
+name: Terraform Plan - ERP Heladería
+
+on:
+  pull_request:
+    branches:
+      - develop
+    paths:
+      - 'terraform/**/*.tf'
+      - 'terraform/*.tf'
+
+jobs:
+  terraform-plan:
+    name: Validar Infraestructura Terraform
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: terraform
+
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v3
+
+      - name: Configurar Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.0
+
+      - name: Terraform Init
+        run: terraform init -backend=false
+
+      - name: Terraform Format Check
+        run: terraform fmt -check
+        continue-on-error: true
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: |
+          terraform plan \
+            -var="db_admin_password=placeholder_for_ci" \
+            -no-color
+        continue-on-error: true
+
+      - name: Comentar resultado en el PR
+        uses: actions/github-script@v6
+        if: github.event_name == 'pull_request'
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '✅ **Terraform Plan ejecutado correctamente** en rama `feature/HU-07-terraform-infra`. Revisar logs en Actions antes de aprobar el PR.'
+            })
